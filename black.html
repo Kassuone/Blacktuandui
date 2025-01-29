@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Black俱乐部</title>
+    <title>Black俱乐部宣传语</title>
     <style>
         body {
             margin: 0;
@@ -98,9 +98,31 @@
                 opacity: 0;
             }
         }
+
+        /* 返回按钮样式 */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background-color: darkred;
+        }
     </style>
 </head>
 <body>
+
+    <!-- 返回按钮 -->
+    <button class="back-button" onclick="window.location.href='https://kassuone.github.io/Blacktuandui/black%E5%AE%98%E7%BD%91.html'">返回</button>
 
     <div class="container">
         <h1>Black俱乐部</h1>
@@ -131,7 +153,6 @@
 
         // 每隔0.3秒生成一个烟花
         setInterval(createFirework, 300);
-
     </script>
 
 </body>
