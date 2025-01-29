@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Black俱乐部</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            line-height: 1.6;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #FFD700;
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+
+        p {
+            font-size: 1.5em;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 1s ease-in-out forwards;
+        }
+
+        .line:nth-child(1) { animation-delay: 0.5s; }
+        .line:nth-child(2) { animation-delay: 1.5s; }
+        .line:nth-child(3) { animation-delay: 2.5s; }
+        .line:nth-child(4) { animation-delay: 3.5s; }
+        .line:nth-child(5) { animation-delay: 4.5s; }
+        .line:nth-child(6) { animation-delay: 5.5s; }
+
+        @keyframes slideUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0% {
+                text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700;
+            }
+            100% {
+                text-shadow: 0 0 20px #FF4500, 0 0 40px #FF4500, 0 0 60px #FF4500;
+            }
+        }
+
+        /* 烟花特效 */
+        .fireworks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .firework {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #FFD700;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Black俱乐部</h1>
+        <p class="line">在Black俱乐部，我们不仅仅是一个聚会的地方，更是一个属于大家的大家庭。</p>
+        <p class="line">这里有欢笑、有热情、有你我他共同创造的每一个瞬间。</p>
+        <p class="line">无论你是想放松一下，还是与志同道合的人一起探索新鲜事物，</p>
+        <p class="line">Black俱乐部都能给你一个温暖的角落。</p>
+        <p class="line">快来加入我们，和我们一起分享那些属于每个人的精彩时刻吧！</p>
+    </div>
+
+    <!-- 烟花效果 -->
+    <div class="fireworks" id="fireworks"></div>
+
+    <script>
+        // 烟花效果
+        function createFirework() {
+            let firework = document.createElement('div');
+            firework.classList.add('firework');
+            firework.style.top = `${Math.random() * 100}%`;
+            firework.style.left = `${Math.random() * 100}%`;
+            document.getElementById('fireworks').appendChild(firework);
+
+            // 清除已消失的烟花
+            setTimeout(() => {
+                firework.remove();
+            }, 1000);
+        }
+
+        // 每隔0.3秒生成一个烟花
+        setInterval(createFirework, 300);
+
+    </script>
+
+</body>
+</html>
