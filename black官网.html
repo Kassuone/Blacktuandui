@@ -11,9 +11,6 @@
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .container {
             max-width: 800px;
@@ -46,84 +43,52 @@
             justify-content: space-around;
             margin-top: 20px;
         }
-        .drawing-container {
+
+        .color-picker {
             display: flex;
-            justify-content: space-around;
-            align-items: center;
+            justify-content: center;
             margin-top: 20px;
+        }
+        .color-box {
+            width: 40px;
+            height: 40px;
+            margin: 0 5px;
+            cursor: pointer;
         }
         #canvas {
             border: 1px solid black;
         }
-        #color-picker {
+
+        /* 文本输入框 */
+        #textInputContainer {
             margin-top: 20px;
-            display: flex;
-            flex-wrap: wrap;
-            width: 200px;
         }
+        #textInput {
+            width: 200px;
+            padding: 5px;
+            margin-right: 10px;
+        }
+        #fontSize {
+            width: 50px;
+            padding: 5px;
+        }
+
+        #backgroundColorPicker {
+            margin-top: 20px;
+        }
+
         .gallery {
-            margin-top: 20px;
+            margin-top: 30px;
             display: flex;
-            flex-wrap: wrap;
             justify-content: center;
+            flex-wrap: wrap;
         }
-        .gallery-item {
+        .gallery img {
             margin: 10px;
-            border: 1px solid #ccc;
-        }
-        .gallery-item img {
-            width: 200px;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        /* 弹窗样式 */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-            padding-top: 60px;
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 10px;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
+            max-width: 150px;
+            max-height: 150px;
             cursor: pointer;
         }
-
-        .color-box {
-            width: 30px;
-            height: 30px;
-            margin: 5px;
-            display: inline-block;
-            cursor: pointer;
-        }
-
     </style>
 </head>
 <body>
@@ -133,88 +98,173 @@
 
     <div class="intro">
         <h2>Black团队介绍</h2>
-        <p>Black团队是PICO轻世界的娱乐组织，为大家提供每时每刻的精彩。</p>
+        <p>Black团队是PICO轻世界的娱乐组织，为大家提供每时每刻的精彩</p>
     </div>
 
     <a href="https://kassuone.github.io/Blacktuandui/black.html" class="button">了解更多</a>
+
+    <!-- 活动选择按钮 -->
+    <div class="activity-buttons">
+        <a href="#drawing-game" class="button">画画</a>
+        <a href="#gallery" class="button">查看其他作品</a>
+    </div>
 </div>
 
 <video src="black宣传.mp4" controls autoplay loop muted>
     您的浏览器不支持video标签。
 </video>
 
-<!-- 活动选择按钮 - 画画按钮移到视频下方 -->
-<div class="activity-buttons">
-    <a href="#drawing-game" class="button">进入画画</a>
-    <a href="#view-gallery" class="button">查看其他人作品</a>
-</div>
-
-<!-- 画画页面 -->
-<div id="drawing-game" style="display:none;">
+<!-- 画画 -->
+<div id="drawing-game" style="display:block;">
     <h2>画画</h2>
-
-    <div class="drawing-container">
-        <!-- 画布 -->
-        <canvas id="canvas" width="500" height="500"></canvas>
-
-        <!-- 颜色选择按钮 -->
-        <button class="button" id="colorBtn">选择画笔颜色</button>
+    <canvas id="canvas" width="500" height="500" style="border: 1px solid black;"></canvas>
+    <div class="color-picker">
+        <div class="color-box" style="background-color: red;" onclick="changeColor('red')"></div>
+        <div class="color-box" style="background-color: blue;" onclick="changeColor('blue')"></div>
+        <div class="color-box" style="background-color: green;" onclick="changeColor('green')"></div>
+        <input type="color" id="colorPicker" onchange="changeColor(this.value)" />
     </div>
 
-    <textarea id="text-input" placeholder="输入文本..." style="width: 200px; height: 50px;"></textarea>
-    <button onclick="drawText()">绘制文本</button>
-    
+    <!-- 背景颜色选择 -->
+    <div id="backgroundColorPicker">
+        <label for="bgColor">背景颜色：</label>
+        <input type="color" id="bgColor" onchange="changeBackgroundColor(this.value)" />
+        <label for="transparentBg">透明背景：</label>
+        <input type="checkbox" id="transparentBg" onchange="toggleTransparentBg()" />
+    </div>
+
+    <!-- 文本绘制 -->
+    <div id="textInputContainer">
+        <input type="text" id="textInput" placeholder="输入文本" />
+        <input type="number" id="fontSize" value="20" min="5" max="100" /> 
+        <button onclick="addText()">添加文本</button>
+    </div>
+
     <button onclick="clearCanvas()">清除画布</button>
-    <button onclick="saveCanvas()">保存为图片</button>
-    <button onclick="saveDrawing()">保存绘画</button>
+    <button onclick="enableErase()">启用橡皮</button>
+    <button onclick="disableErase()">禁用橡皮</button>
+    <button onclick="saveCanvas()">保存作品</button>
+    <button onclick="downloadCanvas()">下载作品</button>
+
+    <script>
+        const drawingCanvas = document.getElementById("canvas");
+        const ctx = drawingCanvas.getContext("2d");
+        let drawing = false;
+        let currentColor = 'black';  // 默认画笔颜色
+        let isErasing = false;  // 是否启用橡皮功能
+        let bgColor = '#ffffff';  // 默认背景颜色
+
+        // 画布背景颜色
+        drawingCanvas.style.backgroundColor = bgColor;
+
+        // 开始绘画
+        drawingCanvas.onmousedown = (e) => {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        };
+
+        drawingCanvas.onmousemove = (e) => {
+            if (drawing) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = 5;
+                ctx.stroke();
+            }
+        };
+
+        drawingCanvas.onmouseup = () => {
+            drawing = false;
+        };
+
+        // 清空画布
+        function clearCanvas() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            drawingCanvas.style.backgroundColor = bgColor;
+        }
+
+        // 改变颜色
+        function changeColor(color) {
+            currentColor = color;
+        }
+
+        // 改变背景颜色
+        function changeBackgroundColor(color) {
+            bgColor = color;
+            if (!document.getElementById('transparentBg').checked) {
+                drawingCanvas.style.backgroundColor = color;
+            }
+        }
+
+        // 开启透明背景
+        function toggleTransparentBg() {
+            if (document.getElementById('transparentBg').checked) {
+                drawingCanvas.style.backgroundColor = 'transparent';
+            } else {
+                drawingCanvas.style.backgroundColor = bgColor;
+            }
+        }
+
+        // 添加文本
+        function addText() {
+            const text = document.getElementById('textInput').value;
+            const fontSize = document.getElementById('fontSize').value;
+            ctx.font = `${fontSize}px Arial`;
+            ctx.fillStyle = currentColor;
+            ctx.fillText(text, 50, 50);  // 可以根据需要修改位置
+        }
+
+        // 启用橡皮功能
+        function enableErase() {
+            isErasing = true;
+            currentColor = bgColor;  // 橡皮擦用背景色来擦除
+        }
+
+        // 禁用橡皮功能
+        function disableErase() {
+            isErasing = false;
+            currentColor = 'black';  // 恢复默认画笔颜色
+        }
+
+        // 橡皮擦功能
+        drawingCanvas.onmousemove = (e) => {
+            if (drawing) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = 10;  // 增加橡皮擦的宽度
+                ctx.stroke();
+            }
+        };
+
+        // 保存作品
+        function saveCanvas() {
+            const dataURL = drawingCanvas.toDataURL('image/png');
+            localStorage.setItem('savedImage', dataURL);
+            alert('作品已保存！');
+        }
+
+        // 下载作品
+        function downloadCanvas() {
+            const dataURL = drawingCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = dataURL;
+            link.download = '作品.png';
+            link.click();
+        }
+    </script>
 </div>
 
-<!-- 作品画廊页面 -->
-<div id="view-gallery" style="display:none;">
-    <h2>其他人作品</h2>
-    <div class="gallery" id="gallery-container">
-        <!-- 作品会在这里动态加载 -->
+<!-- 作品展示 -->
+<div id="gallery" style="display:none;">
+    <h2>其他人的作品</h2>
+    <div class="gallery" id="galleryContainer">
+        <!-- 这里会显示保存的作品 -->
     </div>
-    <button onclick="goBack()">返回画画</button>
-</div>
-
-<!-- 颜色选择弹窗 -->
-<div id="colorModal" class="modal">
-    <div class="modal-content">
-        <span class="close" id="closeModal">&times;</span>
-        <h2>选择画笔颜色</h2>
-        <div id="color-picker">
-            <div class="color-box" style="background-color: red;" onclick="changeColor('red')"></div>
-            <div class="color-box" style="background-color: blue;" onclick="changeColor('blue')"></div>
-            <div class="color-box" style="background-color: green;" onclick="changeColor('green')"></div>
-            <div class="color-box" style="background-color: black;" onclick="changeColor('black')"></div>
-            <div class="color-box" style="background-color: orange;" onclick="changeColor('orange')"></div>
-            <div class="color-box" style="background-color: yellow;" onclick="changeColor('yellow')"></div>
-            <div class="color-box" style="background-color: purple;" onclick="changeColor('purple')"></div>
-            <div class="color-box" style="background-color: pink;" onclick="changeColor('pink')"></div>
-            <div class="color-box" style="background-color: brown;" onclick="changeColor('brown')"></div>
-            <div class="color-box" style="background-color: gray;" onclick="changeColor('gray')"></div>
-            <div class="color-box" style="background-color: violet;" onclick="changeColor('violet')"></div>
-            <div class="color-box" style="background-color: cyan;" onclick="changeColor('cyan')"></div>
-            <div class="color-box" style="background-color: magenta;" onclick="changeColor('magenta')"></div>
-            <div class="color-box" style="background-color: lime;" onclick="changeColor('lime')"></div>
-            <div class="color-box" style="background-color: gold;" onclick="changeColor('gold')"></div>
-            <div class="color-box" style="background-color: silver;" onclick="changeColor('silver')"></div>
-            <div class="color-box" style="background-color: teal;" onclick="changeColor('teal')"></div>
-            <div class="color-box" style="background-color: indigo;" onclick="changeColor('indigo')"></div>
-            <div class="color-box" style="background-color: olive;" onclick="changeColor('olive')"></div>
-            <div class="color-box" style="background-color: coral;" onclick="changeColor('coral')"></div>
-            <div class="color-box" style="background-color: peachpuff;" onclick="changeColor('peachpuff')"></div>
-            <div class="color-box" style="background-color: beige;" onclick="changeColor('beige')"></div>
-            <div class="color-box" style="background-color: mintcream;" onclick="changeColor('mintcream')"></div>
-            <div class="color-box" style="background-color: lavender;" onclick="changeColor('lavender')"></div>
-            <input type="color" id="colorPicker" onchange="changeColor(this.value)" />
-        </div>
-    </div>
+    <button onclick="loadGallery()">加载作品</button>
 </div>
 
 <script>
-    // 活动页面控制
+    // 显示不同的活动区域
     document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
@@ -226,115 +276,17 @@
         });
     });
 
-    // 绘画功能
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    let drawing = false;
-    let currentColor = 'black';  // 默认颜色
-
-    // 设置默认画布内容
-    window.onload = () => {
-        const savedDrawing = localStorage.getItem('drawing');
-        if (savedDrawing) {
-            const image = new Image();
-            image.src = savedDrawing;
-            image.onload = () => {
-                ctx.drawImage(image, 0, 0);
-            };
-        }
-    };
-
-    // 画画功能
-    canvas.onmousedown = (e) => {
-        drawing = true;
-        ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
-    };
-
-    canvas.onmousemove = (e) => {
-        if (drawing) {
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle = currentColor;
-            ctx.lineWidth = 5;
-            ctx.stroke();
-        }
-    };
-
-    canvas.onmouseup = () => {
-        drawing = false;
-    };
-
-    // 选择画笔颜色
-    function changeColor(color) {
-        currentColor = color;
-        closeModal(); // 关闭弹窗
-    }
-
-    // 绘制文本
-    function drawText() {
-        const text = document.getElementById("text-input").value;
-        ctx.font = '20px Arial';
-        ctx.fillStyle = currentColor;
-        ctx.fillText(text, 50, 50); // 文本位置可以根据需要调整
-    }
-
-    // 清空画布
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // 保存画布为图片
-    function saveCanvas() {
-        const dataURL = canvas.toDataURL();
-        const link = document.createElement('a');
-        link.href = dataURL;
-        link.download = 'drawing.png';
-        link.click();
-    }
-
-    // 保存绘画内容
-    function saveDrawing() {
-        const dataURL = canvas.toDataURL();
-        let drawings = JSON.parse(localStorage.getItem('drawings')) || [];
-        drawings.push(dataURL);
-        localStorage.setItem('drawings', JSON.stringify(drawings));
-        alert('绘画已保存！');
-    }
-
-    // 查看其他人作品
+    // 加载保存的作品
     function loadGallery() {
-        const galleryContainer = document.getElementById("gallery-container");
-        galleryContainer.innerHTML = ''; // 清空画廊
-
-        const drawings = JSON.parse(localStorage.getItem('drawings')) || [];
-        drawings.forEach((drawing, index) => {
-            const galleryItem = document.createElement('div');
-            galleryItem.className = 'gallery-item';
+        const savedImage = localStorage.getItem('savedImage');
+        if (savedImage) {
             const img = document.createElement('img');
-            img.src = drawing;
-            galleryItem.appendChild(img);
-            galleryContainer.appendChild(galleryItem);
-        });
+            img.src = savedImage;
+            document.getElementById('galleryContainer').appendChild(img);
+        } else {
+            alert('没有找到保存的作品');
+        }
     }
-
-    // 返回到画画页面
-    function goBack() {
-        document.getElementById("drawing-game").style.display = "block";
-        document.getElementById("view-gallery").style.display = "none";
-    }
-
-    // 打开颜色选择弹窗
-    document.getElementById("colorBtn").onclick = () => {
-        document.getElementById("colorModal").style.display = "block";
-    };
-
-    // 关闭颜色选择弹窗
-    document.getElementById("closeModal").onclick = () => {
-        document.getElementById("colorModal").style.display = "none";
-    };
-
-    // 加载作品画廊
-    window.onload = loadGallery;
 </script>
 
 </body>
