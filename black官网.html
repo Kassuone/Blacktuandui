@@ -89,6 +89,57 @@
             max-height: 150px;
             cursor: pointer;
         }
+
+        /* 弹窗样式 */
+        #drawingModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        #drawingModal canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 查看作品弹窗样式 */
+        #galleryModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        #galleryModal img {
+            max-width: 100%;
+            max-height: 400px;
+        }
+
+        /* 背景颜色更改按钮 */
+        #bgColorBtn {
+            margin-top: 20px;
+        }
+
+        /* 关闭按钮样式 */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -105,8 +156,8 @@
 
     <!-- 活动选择按钮 -->
     <div class="activity-buttons">
-        <a href="#drawing-game" class="button">画画</a>
-        <a href="#gallery" class="button">查看其他作品</a>
+        <a href="#drawing-game" class="button" id="openDrawing">画画</a>
+        <a href="#gallery" class="button" id="viewGallery">查看其他作品</a>
     </div>
 </div>
 
@@ -114,10 +165,13 @@
     您的浏览器不支持video标签。
 </video>
 
-<!-- 画画 -->
-<div id="drawing-game" style="display:block;">
+<!-- 画画弹窗 -->
+<div id="drawingModal">
+    <span class="close-btn" onclick="closeDrawingModal()">×</span>
     <h2>画画</h2>
     <canvas id="canvas" width="500" height="500" style="border: 1px solid black;"></canvas>
+
+    <!-- 画笔颜色 -->
     <div class="color-picker">
         <div class="color-box" style="background-color: red;" onclick="changeColor('red')"></div>
         <div class="color-box" style="background-color: blue;" onclick="changeColor('blue')"></div>
@@ -125,8 +179,13 @@
         <input type="color" id="colorPicker" onchange="changeColor(this.value)" />
     </div>
 
+    <!-- 背景颜色更改按钮 -->
+    <div id="bgColorBtn">
+        <button onclick="openBgColorPicker()">更改背景颜色</button>
+    </div>
+
     <!-- 背景颜色选择 -->
-    <div id="backgroundColorPicker">
+    <div id="backgroundColorPicker" style="display:none;">
         <label for="bgColor">背景颜色：</label>
         <input type="color" id="bgColor" onchange="changeBackgroundColor(this.value)" />
         <label for="transparentBg">透明背景：</label>
@@ -136,7 +195,7 @@
     <!-- 文本绘制 -->
     <div id="textInputContainer">
         <input type="text" id="textInput" placeholder="输入文本" />
-        <input type="number" id="fontSize" value="20" min="5" max="100" /> 
+        <input type="number" id="fontSize" value="20" min="5" max="100" />
         <button onclick="addText()">添加文本</button>
     </div>
 
@@ -146,148 +205,188 @@
     <button onclick="saveCanvas()">保存作品</button>
     <button onclick="downloadCanvas()">下载作品</button>
 
-    <script>
-        const drawingCanvas = document.getElementById("canvas");
-        const ctx = drawingCanvas.getContext("2d");
-        let drawing = false;
-        let currentColor = 'black';  // 默认画笔颜色
-        let isErasing = false;  // 是否启用橡皮功能
-        let bgColor = '#ffffff';  // 默认背景颜色
-
-        // 画布背景颜色
-        drawingCanvas.style.backgroundColor = bgColor;
-
-        // 开始绘画
-        drawingCanvas.onmousedown = (e) => {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        };
-
-        drawingCanvas.onmousemove = (e) => {
-            if (drawing) {
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.strokeStyle = currentColor;
-                ctx.lineWidth = 5;
-                ctx.stroke();
-            }
-        };
-
-        drawingCanvas.onmouseup = () => {
-            drawing = false;
-        };
-
-        // 清空画布
-        function clearCanvas() {
-            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-            drawingCanvas.style.backgroundColor = bgColor;
-        }
-
-        // 改变颜色
-        function changeColor(color) {
-            currentColor = color;
-        }
-
-        // 改变背景颜色
-        function changeBackgroundColor(color) {
-            bgColor = color;
-            if (!document.getElementById('transparentBg').checked) {
-                drawingCanvas.style.backgroundColor = color;
-            }
-        }
-
-        // 开启透明背景
-        function toggleTransparentBg() {
-            if (document.getElementById('transparentBg').checked) {
-                drawingCanvas.style.backgroundColor = 'transparent';
-            } else {
-                drawingCanvas.style.backgroundColor = bgColor;
-            }
-        }
-
-        // 添加文本
-        function addText() {
-            const text = document.getElementById('textInput').value;
-            const fontSize = document.getElementById('fontSize').value;
-            ctx.font = `${fontSize}px Arial`;
-            ctx.fillStyle = currentColor;
-            ctx.fillText(text, 50, 50);  // 可以根据需要修改位置
-        }
-
-        // 启用橡皮功能
-        function enableErase() {
-            isErasing = true;
-            currentColor = bgColor;  // 橡皮擦用背景色来擦除
-        }
-
-        // 禁用橡皮功能
-        function disableErase() {
-            isErasing = false;
-            currentColor = 'black';  // 恢复默认画笔颜色
-        }
-
-        // 橡皮擦功能
-        drawingCanvas.onmousemove = (e) => {
-            if (drawing) {
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.strokeStyle = currentColor;
-                ctx.lineWidth = 10;  // 增加橡皮擦的宽度
-                ctx.stroke();
-            }
-        };
-
-        // 保存作品
-        function saveCanvas() {
-            const dataURL = drawingCanvas.toDataURL('image/png');
-            localStorage.setItem('savedImage', dataURL);
-            alert('作品已保存！');
-        }
-
-        // 下载作品
-        function downloadCanvas() {
-            const dataURL = drawingCanvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = dataURL;
-            link.download = '作品.png';
-            link.click();
-        }
-    </script>
+    <button onclick="disableTextDrag()">禁用文本拖动</button>
+    <button onclick="enableTextDrag()">启用文本拖动</button>
 </div>
 
-<!-- 作品展示 -->
-<div id="gallery" style="display:none;">
-    <h2>其他人的作品</h2>
-    <div class="gallery" id="galleryContainer">
-        <!-- 这里会显示保存的作品 -->
+<!-- 查看作品弹窗 -->
+<div id="galleryModal">
+    <span class="close-btn" onclick="closeGalleryModal()">×</span>
+    <h2>其他作品</h2>
+    <div class="gallery">
+        <!-- 这里可以动态展示存储的作品 -->
+        <img src="savedImage.jpg" alt="作品1" />
+        <img src="savedImage.jpg" alt="作品2" />
     </div>
-    <button onclick="loadGallery()">加载作品</button>
 </div>
 
 <script>
-    // 显示不同的活动区域
-    document.querySelectorAll('.button').forEach(button => {
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = e.target.getAttribute('href').substring(1);
-            document.querySelectorAll('div[id]').forEach(div => {
-                div.style.display = 'none';
-            });
-            document.getElementById(targetId).style.display = 'block';
-        });
+    const drawingCanvas = document.getElementById("canvas");
+    const ctx = drawingCanvas.getContext("2d");
+    let drawing = false;
+    let currentColor = 'black';  // 默认画笔颜色
+    let isErasing = false;  // 是否启用橡皮功能
+    let bgColor = '#ffffff';  // 默认背景颜色
+    let textElement = null; // 存储当前添加的文本元素
+    let isTextDragEnabled = false; // 是否启用文本拖动
+    let isDrawingEnabled = true; // 是否启用绘画
+
+    // 开始绘画
+    drawingCanvas.onmousedown = (e) => {
+        if (isDrawingEnabled) {
+            drawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
+    };
+
+    drawingCanvas.onmousemove = (e) => {
+        if (isDrawingEnabled && drawing) {
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = 5;
+            ctx.stroke();
+        }
+
+        // 文本拖动
+        if (isTextDragEnabled && textElement && textElement.isDragging) {
+            textElement.x = e.offsetX;
+            textElement.y = e.offsetY;
+            drawText();
+        }
+    };
+
+    drawingCanvas.onmouseup = () => {
+        drawing = false;
+    };
+
+    // 清空画布
+    function clearCanvas() {
+        ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        drawingCanvas.style.backgroundColor = bgColor;
+        if (textElement) {
+            drawText(); // 重新绘制文本
+        }
+    }
+
+    // 改变颜色
+    function changeColor(color) {
+        currentColor = color;
+    }
+
+    // 改变背景颜色
+    function changeBackgroundColor(color) {
+        bgColor = color;
+        if (!document.getElementById('transparentBg').checked) {
+            drawingCanvas.style.backgroundColor = color;
+        }
+        if (textElement) {
+            drawText(); // 重新绘制文本
+        }
+    }
+
+    // 开启透明背景
+    function toggleTransparentBg() {
+        if (document.getElementById('transparentBg').checked) {
+            drawingCanvas.style.backgroundColor = 'transparent';
+        } else {
+            drawingCanvas.style.backgroundColor = bgColor;
+        }
+    }
+
+    // 添加文本
+    function addText() {
+        const text = document.getElementById('textInput').value;
+        const fontSize = document.getElementById('fontSize').value;
+        ctx.font = `${fontSize}px Arial`;
+        ctx.fillStyle = currentColor;
+
+        // 添加文本并实现拖动功能
+        textElement = {
+            text: text,
+            x: 50,
+            y: 50,
+            fontSize: fontSize,
+            isDragging: false
+        };
+
+        drawText();
+    }
+
+    // 绘制文本
+    function drawText() {
+        ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+        ctx.fillText(textElement.text, textElement.x, textElement.y);
+    }
+
+    // 启用橡皮功能
+    function enableErase() {
+        isErasing = true;
+        currentColor = bgColor;  // 橡皮擦用背景色来擦除
+    }
+
+    // 禁用橡皮功能
+    function disableErase() {
+        isErasing = false;
+        currentColor = 'black';  // 恢复画笔颜色
+    }
+
+    // 保存作品
+    function saveCanvas() {
+        const imageData = drawingCanvas.toDataURL();
+        localStorage.setItem('savedImage', imageData);
+        alert('作品已保存!');
+    }
+
+    // 下载作品
+    function downloadCanvas() {
+        const link = document.createElement('a');
+        link.href = drawingCanvas.toDataURL();
+        link.download = 'drawing.png';
+        link.click();
+    }
+
+    // 打开背景颜色选择器
+    function openBgColorPicker() {
+        document.getElementById('backgroundColorPicker').style.display = 'block';
+    }
+
+    // 关闭画画弹窗
+    function closeDrawingModal() {
+        clearCanvas(); // 清空画布内容
+        document.getElementById('drawingModal').style.display = 'none';
+    }
+
+    // 打开画画功能弹窗
+    document.getElementById('openDrawing').addEventListener('click', () => {
+        document.getElementById('drawingModal').style.display = 'block';
     });
 
-    // 加载保存的作品
-    function loadGallery() {
-        const savedImage = localStorage.getItem('savedImage');
-        if (savedImage) {
-            const img = document.createElement('img');
-            img.src = savedImage;
-            document.getElementById('galleryContainer').appendChild(img);
-        } else {
-            alert('没有找到保存的作品');
+    // 打开查看作品弹窗
+    document.getElementById('viewGallery').addEventListener('click', () => {
+        document.getElementById('galleryModal').style.display = 'block';
+    });
+
+    // 关闭查看作品弹窗
+    function closeGalleryModal() {
+        document.getElementById('galleryModal').style.display = 'none';
+    }
+
+    // 启用文本拖动
+    function enableTextDrag() {
+        isDrawingEnabled = false; // 禁用绘画
+        if (textElement) {
+            textElement.isDragging = true;
+        }
+    }
+
+    // 禁用文本拖动
+    function disableTextDrag() {
+        isDrawingEnabled = true; // 启用绘画
+        if (textElement) {
+            textElement.isDragging = false;
         }
     }
 </script>
-
 </body>
 </html>
