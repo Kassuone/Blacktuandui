@@ -1,93 +1,120 @@
 <!DOCTYPE html>
 <html lang="zh">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Black团队官网</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             text-align: center;
-            background-color: #f4f4f4;
+            background-color: #000;
+            color: #fff;
             margin: 0;
             padding: 0;
+            background-image: url('https://example.com/decorative-bg.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
         }
-        .container {
+
+       .container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
-        .button {
-            background-color: #333;
-            color: white;
-            padding: 10px 20px;
+
+       .button {
+            background-color: #FFD700;
+            color: #000;
+            padding: 12px 24px;
             font-size: 16px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
             margin: 20px;
             text-decoration: none;
             display: inline-block;
+            transition: background-color 0.3s ease;
         }
-        .button:hover {
-            background-color: #555;
+
+       .button:hover {
+            background-color: #e6b800;
         }
-        .intro {
-            background-color: #fff;
+
+       .intro {
+            background-color: rgba(0, 0, 0, 0.7);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.5);
             margin-bottom: 30px;
         }
-        .activity-buttons {
+
+       .activity-buttons {
             display: flex;
             justify-content: space-around;
             margin-top: 20px;
         }
 
-        .color-picker {
+       .color-picker {
             display: flex;
             justify-content: center;
             margin-top: 20px;
         }
-        .color-box {
+
+       .color-box {
             width: 40px;
             height: 40px;
             margin: 0 5px;
             cursor: pointer;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(255, 215, 0, 0.5);
         }
+
         #canvas {
-            border: 1px solid black;
+            border: 1px solid #fff;
+            background-color: #333;
         }
 
         /* 文本输入框 */
         #textInputContainer {
             margin-top: 20px;
         }
+
         #textInput {
             width: 200px;
-            padding: 5px;
+            padding: 6px;
             margin-right: 10px;
+            border: none;
+            border-radius: 5px;
         }
+
         #fontSize {
             width: 50px;
-            padding: 5px;
+            padding: 6px;
+            border: none;
+            border-radius: 5px;
         }
 
         #backgroundColorPicker {
             margin-top: 20px;
         }
 
-        .gallery {
+       .gallery {
             margin-top: 30px;
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
         }
-        .gallery img {
+
+       .gallery img {
             margin: 10px;
             max-width: 150px;
             max-height: 150px;
             cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(255, 215, 0, 0.5);
         }
 
         /* 弹窗样式 */
@@ -97,10 +124,10 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: white;
+            background-color: rgba(0, 0, 0, 0.7);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.5);
             z-index: 100;
         }
 
@@ -116,15 +143,17 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: white;
+            background-color: rgba(0, 0, 0, 0.7);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(255, 215, 0, 0.5);
             z-index: 100;
         }
+
         #galleryModal img {
             max-width: 100%;
             max-height: 400px;
+            border-radius: 5px;
         }
 
         /* 背景颜色更改按钮 */
@@ -133,260 +162,325 @@
         }
 
         /* 关闭按钮样式 */
-        .close-btn {
+       .close-btn {
             position: absolute;
             top: 10px;
             right: 10px;
             font-size: 20px;
             cursor: pointer;
+            color: #fff;
+        }
+
+        video {
+            border: 5px solid #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            max-width: 100%;
+        }
+
+        /* 图标按钮样式 */
+       .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            padding: 5px;
+        }
+
+       .icon-button svg {
+            fill: #FFD700;
+            width: 30px;
+            height: 30px;
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <h1>欢迎来到Black团队官网</h1>
+    <div class="container">
+        <h1>欢迎来到Black团队官网</h1>
 
-    <div class="intro">
-        <h2>Black团队介绍</h2>
-        <p>Black团队是PICO轻世界的娱乐组织，为大家提供每时每刻的精彩</p>
-         <a href="https://kassuone.github.io/Blacktuandui/black.html" class="button" style="border-radius: 10px;">了解更多</a>
+        <div class="intro">
+            <h2>Black团队介绍</h2>
+            <p>Black团队是PICO轻世界的娱乐组织，为大家提供每时每刻的精彩</p>
+            <a href="https://kassuone.github.io/Blacktuandui/black.html" class="button">了解更多</a>
+        </div>
+
+        <!-- 活动选择按钮 -->
+        <div class="intro">
+            <h2>Black娱乐游戏入口</h2>
+            <a href="#drawing-game" class="button" id="openDrawing">画画</a>
+            <a href="#gallery" class="button" id="viewGallery">查看其他作品</a>
+        </div>
     </div>
 
-    <!-- 活动选择按钮 -->
-    <div class="intro">
-        <h2>Black娱乐游戏入口</h2>
-        <a href="#drawing-game" class="button" id="openDrawing" style="border-radius: 10px;">画画</a>
-        <a href="#gallery" class="button" id="viewGallery" style="border-radius: 10px;">查看其他作品</a>
+    <video src="black宣传.mp4" controls autoplay loop muted>
+        您的浏览器不支持video标签。
+    </video>
+
+    <!-- 画画弹窗 -->
+    <div id="drawingModal">
+        <span class="close-btn" onclick="closeDrawingModal()">×</span>
+        <h2>画画</h2>
+        <canvas id="canvas" width="500" height="500"></canvas>
+
+        <!-- 画笔颜色 -->
+        <div class="color-picker">
+            <div class="color-box" style="background-color: red;" onclick="changeColor('red')"></div>
+            <div class="color-box" style="background-color: blue;" onclick="changeColor('blue')"></div>
+            <div class="color-box" style="background-color: green;" onclick="changeColor('green')"></div>
+            <input type="color" id="colorPicker" onchange="changeColor(this.value)" />
+        </div>
+
+        <!-- 背景颜色更改按钮 -->
+        <div id="bgColorBtn">
+            <button onclick="openBgColorPicker()" class="icon-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+            </button>
+        </div>
+
+        <!-- 背景颜色选择 -->
+        <div id="backgroundColorPicker" style="display:none;">
+            <label for="bgColor" style="color: #fff;">背景颜色：</label>
+            <input type="color" id="bgColor" onchange="changeBackgroundColor(this.value)" />
+            <label for="transparentBg" style="color: #fff;">透明背景：</label>
+            <input type="checkbox" id="transparentBg" onchange="toggleTransparentBg()" />
+        </div>
+
+        <!-- 文本绘制 -->
+        <div id="textInputContainer">
+            <input type="text" id="textInput" placeholder="输入文本" />
+            <input type="number" id="fontSize" value="20" min="5" max="100" />
+            <button onclick="addText()" class="icon-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M2 4v16h20V4H2zm18 14H4V6h16v12z"/>
+                    <path d="M10 10h4v4h-4z"/>
+                </svg>
+            </button>
+        </div>
+
+        <button onclick="clearCanvas()" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+        </button>
+        <button onclick="enableErase()" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/>
+            </svg>
+        </button>
+        <button onclick="disableErase()" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83zM3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM12 12l5.59 5.59L17.01 19 12 13.99 6.99 19 5.41 17.41 12 12z"/>
+            </svg>
+        </button>
+        <button onclick="saveCanvas()" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+            </svg>
+        </button>
+        <button onclick="downloadCanvas()" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+            </svg>
+        </button>
+
+        <button onclick="disableTextDrag()" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                <path d="M10 10h4v4h-4z"/>
+                <path d="M12 12l5.59 5.59L17.01 19 12 13.99 6.99 19 5.41 17.41 12 12z"/>
+            </svg>
+        </button>
+        <button onclick="enableTextDrag()" class="icon-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                <path d="M10 10h4v4h-4z"/>
+            </svg>
+        </button>
     </div>
-</div>
 
-<video src="black宣传.mp4" controls autoplay loop muted>
-    您的浏览器不支持video标签。
-</video>
-
-<!-- 画画弹窗 -->
-<div id="drawingModal">
-    <span class="close-btn" onclick="closeDrawingModal()">×</span>
-    <h2>画画</h2>
-    <canvas id="canvas" width="500" height="500" style="border: 1px solid black;"></canvas>
-
-    <!-- 画笔颜色 -->
-    <div class="color-picker">
-        <div class="color-box" style="background-color: red;" onclick="changeColor('red')"></div>
-        <div class="color-box" style="background-color: blue;" onclick="changeColor('blue')"></div>
-        <div class="color-box" style="background-color: green;" onclick="changeColor('green')"></div>
-        <input type="color" id="colorPicker" onchange="changeColor(this.value)" />
+    <!-- 查看作品弹窗 -->
+    <div id="galleryModal">
+        <span class="close-btn" onclick="closeGalleryModal()">×</span>
+        <h2>其他作品</h2>
+        <div class="gallery">
+            <!-- 这里可以动态展示存储的作品 -->
+            <img src="savedImage.jpg" alt="作品1" />
+            <img src="savedImage.jpg" alt="作品2" />
+        </div>
     </div>
 
-    <!-- 背景颜色更改按钮 -->
-    <div id="bgColorBtn">
-        <button onclick="openBgColorPicker()">更改背景颜色</button>
-    </div>
+    <script>
+        const drawingCanvas = document.getElementById("canvas");
+        const ctx = drawingCanvas.getContext("2d");
+        let drawing = false;
+        let currentColor = 'black'; // 默认画笔颜色
+        let isErasing = false; // 是否启用橡皮功能
+        let bgColor = '#333'; // 默认背景颜色
+        let textElement = null; // 存储当前添加的文本元素
+        let isTextDragEnabled = false; // 是否启用文本拖动
+        let isDrawingEnabled = true; // 是否启用绘画
 
-    <!-- 背景颜色选择 -->
-    <div id="backgroundColorPicker" style="display:none;">
-        <label for="bgColor">背景颜色：</label>
-        <input type="color" id="bgColor" onchange="changeBackgroundColor(this.value)" />
-        <label for="transparentBg">透明背景：</label>
-        <input type="checkbox" id="transparentBg" onchange="toggleTransparentBg()" />
-    </div>
-
-    <!-- 文本绘制 -->
-    <div id="textInputContainer">
-        <input type="text" id="textInput" placeholder="输入文本" />
-        <input type="number" id="fontSize" value="20" min="5" max="100" />
-        <button onclick="addText()">添加文本</button>
-    </div>
-
-    <button onclick="clearCanvas()">清除画布</button>
-    <button onclick="enableErase()">启用橡皮</button>
-    <button onclick="disableErase()">禁用橡皮</button>
-    <button onclick="saveCanvas()">保存作品</button>
-    <button onclick="downloadCanvas()">下载作品</button>
-
-    <button onclick="disableTextDrag()">禁用文本拖动</button>
-    <button onclick="enableTextDrag()">启用文本拖动</button>
-</div>
-
-<!-- 查看作品弹窗 -->
-<div id="galleryModal">
-    <span class="close-btn" onclick="closeGalleryModal()">×</span>
-    <h2>其他作品</h2>
-    <div class="gallery">
-        <!-- 这里可以动态展示存储的作品 -->
-        <img src="savedImage.jpg" alt="作品1" />
-        <img src="savedImage.jpg" alt="作品2" />
-    </div>
-</div>
-
-<script>
-    const drawingCanvas = document.getElementById("canvas");
-    const ctx = drawingCanvas.getContext("2d");
-    let drawing = false;
-    let currentColor = 'black';  // 默认画笔颜色
-    let isErasing = false;  // 是否启用橡皮功能
-    let bgColor = '#ffffff';  // 默认背景颜色
-    let textElement = null; // 存储当前添加的文本元素
-    let isTextDragEnabled = false; // 是否启用文本拖动
-    let isDrawingEnabled = true; // 是否启用绘画
-
-    // 开始绘画
-    drawingCanvas.onmousedown = (e) => {
-        if (isDrawingEnabled) {
-            drawing = true;
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        }
-    };
-
-    drawingCanvas.onmousemove = (e) => {
-        if (isDrawingEnabled && drawing) {
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle = currentColor;
-            ctx.lineWidth = 5;
-            ctx.stroke();
-        }
-
-        // 文本拖动
-        if (isTextDragEnabled && textElement && textElement.isDragging) {
-            textElement.x = e.offsetX;
-            textElement.y = e.offsetY;
-            drawText();
-        }
-    };
-
-    drawingCanvas.onmouseup = () => {
-        drawing = false;
-    };
-
-    // 清空画布
-    function clearCanvas() {
-        ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-        drawingCanvas.style.backgroundColor = bgColor;
-        if (textElement) {
-            drawText(); // 重新绘制文本
-        }
-    }
-
-    // 改变颜色
-    function changeColor(color) {
-        currentColor = color;
-    }
-
-    // 改变背景颜色
-    function changeBackgroundColor(color) {
-        bgColor = color;
-        if (!document.getElementById('transparentBg').checked) {
-            drawingCanvas.style.backgroundColor = color;
-        }
-        if (textElement) {
-            drawText(); // 重新绘制文本
-        }
-    }
-
-    // 开启透明背景
-    function toggleTransparentBg() {
-        if (document.getElementById('transparentBg').checked) {
-            drawingCanvas.style.backgroundColor = 'transparent';
-        } else {
-            drawingCanvas.style.backgroundColor = bgColor;
-        }
-    }
-
-    // 添加文本
-    function addText() {
-        const text = document.getElementById('textInput').value;
-        const fontSize = document.getElementById('fontSize').value;
-        ctx.font = `${fontSize}px Arial`;
-        ctx.fillStyle = currentColor;
-
-        // 添加文本并实现拖动功能
-        textElement = {
-            text: text,
-            x: 50,
-            y: 50,
-            fontSize: fontSize,
-            isDragging: false
+        // 开始绘画
+        drawingCanvas.onmousedown = (e) => {
+            if (isDrawingEnabled) {
+                drawing = true;
+                ctx.beginPath();
+                ctx.moveTo(e.offsetX, e.offsetY);
+            }
         };
 
-        drawText();
-    }
+        drawingCanvas.onmousemove = (e) => {
+            if (isDrawingEnabled && drawing) {
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = 5;
+                ctx.stroke();
+            }
 
-    // 绘制文本
-    function drawText() {
-        ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
-        ctx.fillText(textElement.text, textElement.x, textElement.y);
-    }
+            // 文本拖动
+            if (isTextDragEnabled && textElement && textElement.isDragging) {
+                textElement.x = e.offsetX;
+                textElement.y = e.offsetY;
+                drawText();
+            }
+        };
 
-    // 启用橡皮功能
-    function enableErase() {
-        isErasing = true;
-        currentColor = bgColor;  // 橡皮擦用背景色来擦除
-    }
+        drawingCanvas.onmouseup = () => {
+            drawing = false;
+        };
 
-    // 禁用橡皮功能
-    function disableErase() {
-        isErasing = false;
-        currentColor = 'black';  // 恢复画笔颜色
-    }
-
-    // 保存作品
-    function saveCanvas() {
-        const imageData = drawingCanvas.toDataURL();
-        localStorage.setItem('savedImage', imageData);
-        alert('作品已保存!');
-    }
-
-    // 下载作品
-    function downloadCanvas() {
-        const link = document.createElement('a');
-        link.href = drawingCanvas.toDataURL();
-        link.download = 'drawing.png';
-        link.click();
-    }
-
-    // 打开背景颜色选择器
-    function openBgColorPicker() {
-        document.getElementById('backgroundColorPicker').style.display = 'block';
-    }
-
-    // 关闭画画弹窗
-    function closeDrawingModal() {
-        clearCanvas(); // 清空画布内容
-        document.getElementById('drawingModal').style.display = 'none';
-    }
-
-    // 打开画画功能弹窗
-    document.getElementById('openDrawing').addEventListener('click', () => {
-        document.getElementById('drawingModal').style.display = 'block';
-    });
-
-    // 打开查看作品弹窗
-    document.getElementById('viewGallery').addEventListener('click', () => {
-        document.getElementById('galleryModal').style.display = 'block';
-    });
-
-    // 关闭查看作品弹窗
-    function closeGalleryModal() {
-        document.getElementById('galleryModal').style.display = 'none';
-    }
-
-    // 启用文本拖动
-    function enableTextDrag() {
-        isDrawingEnabled = false; // 禁用绘画
-        if (textElement) {
-            textElement.isDragging = true;
+        // 清空画布
+        function clearCanvas() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            drawingCanvas.style.backgroundColor = bgColor;
+            if (textElement) {
+                drawText(); // 重新绘制文本
+            }
         }
-    }
 
-    // 禁用文本拖动
-    function disableTextDrag() {
-        isDrawingEnabled = true; // 启用绘画
-        if (textElement) {
-            textElement.isDragging = false;
+        // 改变颜色
+        function changeColor(color) {
+            currentColor = color;
         }
-    }
-</script>
+
+        // 改变背景颜色
+        function changeBackgroundColor(color) {
+            bgColor = color;
+            if (!document.getElementById('transparentBg').checked) {
+                drawingCanvas.style.backgroundColor = color;
+            }
+            if (textElement) {
+                drawText(); // 重新绘制文本
+            }
+        }
+
+        // 开启透明背景
+        function toggleTransparentBg() {
+            if (document.getElementById('transparentBg').checked) {
+                drawingCanvas.style.backgroundColor = 'transparent';
+            } else {
+                drawingCanvas.style.backgroundColor = bgColor;
+            }
+        }
+
+        // 添加文本
+        function addText() {
+            const text = document.getElementById('textInput').value;
+            const fontSize = document.getElementById('fontSize').value;
+            ctx.font = `${fontSize}px Arial`;
+            ctx.fillStyle = currentColor;
+
+            // 添加文本并实现拖动功能
+            textElement = {
+                text: text,
+                x: 50,
+                y: 50,
+                fontSize: fontSize,
+                isDragging: false
+            };
+
+            drawText();
+        }
+
+        // 绘制文本
+        function drawText() {
+            ctx.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+            ctx.fillText(textElement.text, textElement.x, textElement.y);
+        }
+
+        // 启用橡皮功能
+        function enableErase() {
+            isErasing = true;
+            currentColor = bgColor; // 橡皮擦用背景色来擦除
+        }
+
+        // 禁用橡皮功能
+        function disableErase() {
+            isErasing = false;
+            currentColor = 'black'; // 恢复画笔颜色
+        }
+
+        // 保存作品
+        function saveCanvas() {
+            const imageData = drawingCanvas.toDataURL();
+            localStorage.setItem('savedImage', imageData);
+            alert('作品已保存!');
+        }
+
+        // 下载作品
+        function downloadCanvas() {
+            const link = document.createElement('a');
+            link.href = drawingCanvas.toDataURL();
+            link.download = 'drawing.png';
+            link.click();
+        }
+
+        // 打开背景颜色选择器
+        function openBgColorPicker() {
+            document.getElementById('backgroundColorPicker').style.display = 'block';
+        }
+
+        // 关闭画画弹窗
+        function closeDrawingModal() {
+            clearCanvas(); // 清空画布内容
+            document.getElementById('drawingModal').style.display = 'none';
+        }
+
+        // 打开画画功能弹窗
+        document.getElementById('openDrawing').addEventListener('click', () => {
+            document.getElementById('drawingModal').style.display = 'block';
+        });
+
+        // 打开查看作品弹窗
+        document.getElementById('viewGallery').addEventListener('click', () => {
+            document.getElementById('galleryModal').style.display = 'block';
+        });
+
+        // 关闭查看作品弹窗
+        function closeGalleryModal() {
+            document.getElementById('galleryModal').style.display = 'none';
+        }
+
+        // 启用文本拖动
+        function enableTextDrag() {
+            isDrawingEnabled = false; // 禁用绘画
+            if (textElement) {
+                textElement.isDragging = true;
+            }
+        }
+
+        // 禁用文本拖动
+        function disableTextDrag() {
+            isDrawingEnabled = true; // 启用绘画
+            if (textElement) {
+                textElement.isDragging = false;
+            }
+        }
+    </script>
+
 </body>
+
 </html>
