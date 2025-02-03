@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Flame Black宣传</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #flame-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        h1 {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: Arial, sans-serif;
+            font-size: 6rem;
+            color: #fff;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            z-index: 1;
+        }
+
+        /* 让 A 字母没有阴影 */
+        h1 span {
+            text-shadow: none;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+</head>
+
+<body>
+    <div id="flame-container"></div>
+    <h1 id="title">BLACK</h1>
+    <script>
+        new p5((p) => {
+            let sources = [];
+            const sourceSpacing = 30;
+            let title = document.getElementById('title');
+            let aSparkParticles = [];
+            let bloodSplashParticles = [];
+            let bloodDropParticles = [];
+            let titleX, titleY;
+            let aIndex;
+
+            p.setup = () => {
+                p.createCanvas(p.windowWidth, p.windowHeight);
+                p.frameRate(60);
+
+                // 创建顶部火焰源
+                for (let x = 0; x < p.width; x += sourceSpacing) {
+                    sources.push(new FlameSource(p, x, 0));
+                }
+                // 创建底部火焰源
+                for (let x = 0; x < p.width; x += sourceSpacing) {
+                    sources.push(new FlameSource(p, x, p.height));
+                }
+                // 创建左侧火焰源
+                for (let y = 0; y < p.height; y += sourceSpacing) {
+                    sources.push(new FlameSource(p, 0, y));
+                }
+                // 创建右侧火焰源
+                for (let y = 0; y < p.height; y += sourceSpacing) {
+                    sources.push(new FlameSource(p, p.width, y));
+                }
+
+                titleX = p.width / 2 - title.offsetWidth / 2;
+                titleY = p.height / 2 - title.offsetHeight / 2;
+
+                aIndex = title.textContent.indexOf('A');
+                const text = title.textContent;
+                for (let i = 0; i < text.length; i++) {
+                    if (text[i] === 'A') {
+                        continue;
+                    }
+                    const charX = titleX + i * 40;
+                    // 初始创建血溅粒子，缩小范围
+                    for (let j = 0; j < 10; j++) {
+                        bloodSplashParticles.push(new BloodSplashParticle(p, charX + p.random(-10, 10), titleY + p.random(-10, 10)));
+                    }
+                    // 初始创建滴血粒子
+                    bloodDropParticles.push(new BloodDropParticle(p, charX + p.random(-5, 5), titleY + title.offsetHeight));
+                }
+            };
+
+            p.draw = () => {
+                p.background(0);
+                for (let source of sources) {
+                    source.emitParticles();
+                    source.updateParticles();
+                    source.displayParticles();
+                }
+
+                // 处理火花特效，让火花在网页正中间
+                if (p.frameCount % 3 === 0) {
+                    const centerX = p.width / 2;
+                    const centerY = p.height / 2;
+                    for (let i = 0; i < 5; i++) {
+                        aSparkParticles.push(new SparkParticle(p, centerX, centerY));
+                    }
+                }
+
+                if (p.frameCount % 30 < 15) {
+                    title.innerHTML = title.textContent.replace('A', '<span style="color: red; opacity: 1;">A</span>');
+                } else {
+                    title.innerHTML = title.textContent.replace('A', '<span style="color: red; opacity: 0;">A</span>');
+                }
+
+                for (let i = aSparkParticles.length - 1; i >= 0; i--) {
+                    let particle = aSparkParticles[i];
+                    particle.update();
+                    particle.display();
+                    if (particle.isDead()) {
+                        aSparkParticles.splice(i, 1);
+                    }
+                }
+
+                // 处理其他字母的血溅特效
+                for (let i = bloodSplashParticles.length - 1; i >= 0; i--) {
+                    let particle = bloodSplashParticles[i];
+                    particle.update();
+                    particle.display();
+                    if (particle.isDead()) {
+                        bloodSplashParticles.splice(i, 1);
+                        const charIndex = i % (title.textContent.length - (aIndex!== -1? 1 : 0));
+                        const charX = titleX + charIndex * 40;
+                        // 缩小血溅粒子重生范围
+                        bloodSplashParticles.push(new BloodSplashParticle(p, charX + p.random(-10, 10), titleY + p.random(-10, 10)));
+                    }
+                }
+
+                // 处理其他字母的滴血特效
+                for (let i = bloodDropParticles.length - 1; i >= 0; i--) {
+                    let particle = bloodDropParticles[i];
+                    particle.update();
+                    particle.display();
+                    if (particle.isDead()) {
+                        bloodDropParticles.splice(i, 1);
+                        const charIndex = i % (title.textContent.length - (aIndex!== -1? 1 : 0));
+                        const charX = titleX + charIndex * 40;
+                        bloodDropParticles.push(new BloodDropParticle(p, charX + p.random(-5, 5), titleY + title.offsetHeight));
+                    }
+                }
+            };
+
+            class FlameSource {
+                constructor(p, x, y) {
+                    this.p = p;
+                    this.pos = p.createVector(x, y);
+                    this.particles = [];
+                }
+
+                emitParticles() {
+                    if (this.p.random(1) < 0.4) {
+                        this.particles.push(new Particle(this.p, this.pos.copy()));
+                    }
+                }
+
+                updateParticles() {
+                    for (let i = this.particles.length - 1; i >= 0; i--) {
+                        let particle = this.particles[i];
+                        particle.update();
+                        if (particle.isDead()) {
+                            this.particles.splice(i, 1);
+                        }
+                    }
+                }
+
+                displayParticles() {
+                    for (let particle of this.particles) {
+                        particle.display();
+                    }
+                }
+            }
+
+            class Particle {
+                constructor(p, pos) {
+                    this.p = p;
+                    this.pos = pos.copy();
+                    this.vel = p5.Vector.random2D();
+                    this.vel.mult(p.random(1, 3));
+                    this.acc = p.createVector(0, 0);
+                    this.lifespan = p.random(100, 255);
+                    this.size = p.random(5, 15);
+                    // 以大红色为主
+                    let red = p.random(200, 255);
+                    let green = p.random(0, 50);
+                    let blue = 0;
+                    this.color = p.color(red, green, blue);
+                }
+
+                applyForce(force) {
+                    this.acc.add(force);
+                }
+
+                update() {
+                    this.vel.add(this.acc);
+                    this.pos.add(this.vel);
+                    this.lifespan -= 2;
+                    this.acc.mult(0);
+                    // 模拟火焰摇曳
+                    let wind = this.p.createVector(this.p.random(-0.1, 0.1), this.p.random(-0.1, 0.1));
+                    this.applyForce(wind);
+                }
+
+                display() {
+                    this.p.noStroke();
+                    this.p.fill(this.color.levels[0], this.color.levels[1], this.color.levels[2], this.lifespan);
+                    this.p.ellipse(this.pos.x, this.pos.y, this.size);
+                }
+
+                isDead() {
+                    return this.lifespan < 0;
+                }
+            }
+
+            class SparkParticle {
+                constructor(p, x, y) {
+                    this.p = p;
+                    this.pos = p.createVector(x, y);
+                    this.vel = p.createVector(p.random(-2, 2), p.random(-5, -1));
+                    this.acc = p.createVector(0, 0);
+                    this.lifespan = p.random(30, 60);
+                    this.size = p.random(2, 5);
+                    this.color = p.color(255, 165, 0);
+                }
+
+                applyForce(force) {
+                    this.acc.add(force);
+                }
+
+                update() {
+                    this.vel.add(this.acc);
+                    this.pos.add(this.vel);
+                    this.lifespan--;
+                    this.acc.mult(0);
+                }
+
+                display() {
+                    this.p.noStroke();
+                    this.p.fill(this.color);
+                    this.p.ellipse(this.pos.x, this.pos.y, this.size);
+                }
+
+                isDead() {
+                    return this.lifespan < 0;
+                }
+            }
+
+            class BloodSplashParticle {
+                constructor(p, x, y) {
+                    this.p = p;
+                    this.pos = p.createVector(x, y);
+                    this.vel = p.createVector(p.random(-3, 3), p.random(-3, 3));
+                    this.acc = p.createVector(0, 0.1);
+                    this.lifespan = p.random(60, 120);
+                    this.size = p.random(3, 8);
+                    this.color = p.color(255, 0, 0);
+                }
+
+                applyForce(force) {
+                    this.acc.add(force);
+                }
+
+                update() {
+                    this.vel.add(this.acc);
+                    this.pos.add(this.vel);
+                    this.lifespan--;
+                }
+
+                display() {
+                    this.p.noStroke();
+                    this.p.fill(this.color);
+                    this.p.ellipse(this.pos.x, this.pos.y, this.size);
+                }
+
+                isDead() {
+                    return this.lifespan < 0;
+                }
+            }
+
+            class BloodDropParticle {
+                constructor(p, x, y) {
+                    this.p = p;
+                    this.pos = p.createVector(x, y);
+                    this.vel = p.createVector(0, p.random(2, 5));
+                    this.acc = p.createVector(0, 0.1);
+                    this.lifespan = p.height - y;
+                    this.size = p.random(5, 10);
+                    this.color = p.color(255, 0, 0);
+                }
+
+                applyForce(force) {
+                    this.acc.add(force);
+                }
+
+                update() {
+                    this.vel.add(this.acc);
+                    this.pos.add(this.vel);
+                    this.lifespan -= this.vel.y;
+                }
+
+                display() {
+                    this.p.noStroke();
+                    this.p.fill(this.color);
+                    this.p.ellipse(this.pos.x, this.pos.y, this.size);
+                }
+
+                isDead() {
+                    return this.lifespan < 0;
+                }
+            }
+        }, 'flame-container');
+    </script>
+</body>
+
+</html>
