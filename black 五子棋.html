@@ -27,6 +27,20 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        /* 返回按钮样式 */
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10;
+        }
 
         #board {
             border: 2px solid #FFD700;
@@ -35,6 +49,7 @@
     </style>
 </head>
 <body>
+    <button class="back-button" onclick="window.location.href='https://kassuone.github.io/Blacktuandui/black%E5%AE%98%E7%BD%91.html'">返回</button>
     <h1>黑金五子棋</h1>
     <div id="controls">
         <select id="playerRole">
