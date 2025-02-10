@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>黑金五子棋</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #FFD700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        #controls {
+            margin: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        select, button {
+            background-color: #1a1a1a;
+            color: #FFD700;
+            border: 1px solid #FFD700;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #board {
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 15px #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <h1>黑金五子棋</h1>
+    <div id="controls">
+        <select id="playerRole">
+            <option value="black">黑方（先手）</option>
+            <option value="white">白方（后手）</option>
+        </select>
+        <select id="difficulty">
+            <option value="1">简单</option>
+            <option value="2">中等</option>
+            <option value="3">困难</option>
+        </select>
+        <button onclick="resetGame()">新游戏</button>
+    </div>
+    <canvas id="board" width="450" height="450"></canvas>
+
+    <script>
+        const canvas = document.getElementById('board');
+        const ctx = canvas.getContext('2d');
+        const size = 15;
+        const cellSize = 30;
+        let board = [];
+        let gameOver = false;
+        let isPlayerTurn = true;
+        let animationFrame = null;
+        let winTextScale = 1;
+        let isAnimating = false;
+
+        function initBoard() {
+            board = Array(size).fill().map(() => Array(size).fill(0));
+            gameOver = false;
+            isAnimating = false;
+            winTextScale = 1;
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            drawBoard();
+        }
+
+        function drawBoard() {
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < size; i++) {
+                ctx.beginPath();
+                ctx.moveTo(i*cellSize + cellSize/2, cellSize/2);
+                ctx.lineTo(i*cellSize + cellSize/2, canvas.height - cellSize/2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(cellSize/2, i*cellSize + cellSize/2);
+                ctx.lineTo(canvas.width - cellSize/2, i*cellSize + cellSize/2);
+                ctx.stroke();
+            }
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (board[i][j] !== 0) {
+                        ctx.beginPath();
+                        ctx.arc(i*cellSize + cellSize/2, j*cellSize + cellSize/2, 12, 0, Math.PI*2);
+                        ctx.fillStyle = board[i][j] === 1 ? '#000000' : '#FFFFFF';
+                        ctx.fill();
+                        ctx.strokeStyle = '#FFD700';
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            if (gameOver && isAnimating) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#FFD700';
+                ctx.font = `${40 * winTextScale}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(winMessage, canvas.width/2, canvas.height/2);
+
+                winTextScale += 0.02;
+                if (winTextScale > 1.2) winTextScale = 1;
+                animationFrame = requestAnimationFrame(drawBoard);
+            }
+        }
+
+        function showWin(message) {
+            gameOver = true;
+            isAnimating = true;
+            winMessage = message;
+            drawBoard();
+        }
+
+        function aiMove() {
+            if (gameOver) return;
+
+            const difficulty = parseInt(document.getElementById('difficulty').value);
+            let bestMove = findBestMove(difficulty);
+
+            if (bestMove) {
+                const [x, y] = bestMove;
+                board[x][y] = currentAIValue();
+                if (checkWin(x, y, currentAIValue())) {
+                    showWin('AI 获胜!');
+                }
+                drawBoard();
+                isPlayerTurn = true;
+            }
+        }
+
+        function findBestMove(difficulty) {
+            let bestScore = -Infinity;
+            let bestMoves = [];
+
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (board[i][j] !== 0) continue;
+
+                    let score = evaluatePosition(i, j, currentAIValue());
+                    if (difficulty >= 2) {
+                        score += evaluatePosition(i, j, currentPlayerValue()) * 0.8;
+                    }
+
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestMoves = [[i, j]];
+                    } else if (score === bestScore) {
+                        bestMoves.push([i, j]);
+                    }
+                }
+            }
+            return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+        }
+
+        function evaluatePosition(x, y, player) {
+            let score = 0;
+            const directions = [[1,0], [0,1], [1,1], [1,-1]];
+
+            directions.forEach(([dx, dy]) => {
+                let consecutive = 0;
+                let openEnds = 0;
+
+                for (let step = 1; step <= 4; step++) {
+                    let xi = x + dx * step;
+                    let yi = y + dy * step;
+                    if (xi < 0 || xi >= size || yi < 0 || yi >= size) break;
+                    if (board[xi][yi] === player) consecutive++;
+                    else {
+                        if (board[xi][yi] === 0) openEnds++;
+                        break;
+                    }
+                }
+
+                for (let step = 1; step <= 4; step++) {
+                    let xi = x - dx * step;
+                    let yi = y - dy * step;
+                    if (xi < 0 || xi >= size || yi < 0 || yi >= size) break;
+                    if (board[xi][yi] === player) consecutive++;
+                    else {
+                        if (board[xi][yi] === 0) openEnds++;
+                        break;
+                    }
+                }
+
+                if (consecutive >= 4) score += 100000;
+                else if (consecutive === 3) {
+                    if (openEnds === 2) score += 5000;
+                    else if (openEnds === 1) score += 1000;
+                } else if (consecutive === 2) {
+                    if (openEnds === 2) score += 500;
+                    else if (openEnds === 1) score += 200;
+                } else if (consecutive === 1 && openEnds === 2) {
+                    score += 100;
+                }
+            });
+
+            return score;
+        }
+
+        function currentPlayerValue() {
+            return document.getElementById('playerRole').value === 'black' ? 1 : 2;
+        }
+
+        function currentAIValue() {
+            return document.getElementById('playerRole').value === 'black' ? 2 : 1;
+        }
+
+        canvas.addEventListener('click', (e) => {
+            if (gameOver || !isPlayerTurn) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / cellSize);
+            const y = Math.floor((e.clientY - rect.top) / cellSize);
+
+            if (x >= 0 && x < size && y >= 0 && y < size && board[x][y] === 0) {
+                board[x][y] = currentPlayerValue();
+                if (checkWin(x, y, currentPlayerValue())) {
+                    showWin('你赢了!');
+                    return;
+                }
+                drawBoard();
+                isPlayerTurn = false;
+                setTimeout(aiMove, 500);
+            }
+        });
+
+        function resetGame() {
+            initBoard();
+            const playerRole = document.getElementById('playerRole').value;
+            isPlayerTurn = playerRole === 'black';
+            if (!isPlayerTurn) {
+                setTimeout(aiMove, 500);
+            }
+        }
+
+        function checkWin(x, y, player) {
+            const directions = [[1,0], [0,1], [1,1], [1,-1]];
+            for (let [dx, dy] of directions) {
+                let count = 1;
+                for (let dir = 1; dir <= 4; dir++) {
+                    let xi = x + dx * dir;
+                    let yi = y + dy * dir;
+                    if (xi < 0 || xi >= size || yi < 0 || yi >= size || board[xi][yi] !== player) break;
+                    count++;
+                }
+                for (let dir = 1; dir <= 4; dir++) {
+                    let xi = x - dx * dir;
+                    let yi = y - dy * dir;
+                    if (xi < 0 || xi >= size || yi < 0 || yi >= size || board[xi][yi] !== player) break;
+                    count++;
+                }
+                if (count >= 5) return true;
+            }
+            return false;
+        }
+
+        resetGame();
+    </script>
+</body>
+</html>
